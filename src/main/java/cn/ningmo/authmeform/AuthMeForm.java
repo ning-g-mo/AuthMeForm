@@ -1,6 +1,7 @@
 package cn.ningmo.authmeform;
 
 import cn.ningmo.authmeform.commands.MainCommand;
+import cn.ningmo.authmeform.commands.LoginCommand;
 import cn.ningmo.authmeform.config.ConfigManager;
 import cn.ningmo.authmeform.listeners.InventoryListener;
 import cn.ningmo.authmeform.listeners.PlayerListener;
@@ -47,6 +48,7 @@ public class AuthMeForm extends JavaPlugin {
         
         // 注册命令
         getCommand("authmeform").setExecutor(new MainCommand(this));
+        getCommand("login").setExecutor(new LoginCommand(this));
         
         getLogger().info("AuthMeForm 插件已成功加载！");
     }
