@@ -21,26 +21,34 @@ public class AnvilGUI {
     private static final Map<UUID, String> playersInLogin = new HashMap<>();
     
     public static void openLoginGUI(Player player) {
+        AuthMeForm.getInstance().getLogger().info("正在为玩家 " + player.getName() + " 打开登录菜单");
+        
         // 记录此玩家正在登录中
         playersInLogin.put(player.getUniqueId(), "");
         
-        // 创建铁砧GUI
-        Inventory inv = Bukkit.createInventory(player, InventoryType.ANVIL, MessageUtils.colorize(AuthMeForm.getInstance().getConfigManager().getMessage("login_title")));
-        
-        // 创建提示物品
-        ItemStack paper = new ItemStack(Material.PAPER);
-        ItemMeta meta = paper.getItemMeta();
-        meta.setDisplayName(MessageUtils.colorize(AuthMeForm.getInstance().getConfigManager().getMessage("login_prompt")));
-        paper.setItemMeta(meta);
-        
-        // 放置物品
-        inv.setItem(0, paper);
-        
-        // 打开GUI
-        player.openInventory(inv);
-        
-        // 发送提示消息
-        MessageUtils.sendMessage(player, "login_message");
+        try {
+            // 创建铁砧GUI
+            Inventory inv = Bukkit.createInventory(player, InventoryType.ANVIL, MessageUtils.colorize(AuthMeForm.getInstance().getConfigManager().getMessage("login_title")));
+            
+            // 创建提示物品
+            ItemStack paper = new ItemStack(Material.PAPER);
+            ItemMeta meta = paper.getItemMeta();
+            meta.setDisplayName(MessageUtils.colorize(AuthMeForm.getInstance().getConfigManager().getMessage("login_prompt")));
+            paper.setItemMeta(meta);
+            
+            // 放置物品
+            inv.setItem(0, paper);
+            
+            // 打开GUI
+            player.openInventory(inv);
+            
+            // 发送提示消息
+            MessageUtils.sendMessage(player, "login_message");
+            AuthMeForm.getInstance().getLogger().info("已为玩家 " + player.getName() + " 打开登录菜单");
+        } catch (Exception e) {
+            AuthMeForm.getInstance().getLogger().severe("为玩家 " + player.getName() + " 打开登录菜单时发生错误: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     public static void openRegisterGUI(Player player) {

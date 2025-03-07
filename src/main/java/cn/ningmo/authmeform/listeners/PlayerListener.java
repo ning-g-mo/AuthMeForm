@@ -76,25 +76,31 @@ public class PlayerListener implements Listener {
     
     private void handleJavaPlayer(Player player, boolean isRegistered) {
         // 检查Java版自动登录
-        if (plugin.getConfigManager().isJavaAutoLoginEnabled() && isRegistered) {
+        if (plugin.getConfigManager().isJavaAnvilEnabled() && isRegistered) {
+            plugin.getLogger().info("尝试为玩家 " + player.getName() + " 提供自动登录");
             MessageUtils.sendMessage(player, "auto_login");
             return;
         }
         
         // 检查是否启用了铁砧菜单
         if (plugin.getConfigManager().isJavaAnvilEnabled()) {
-            // 延迟打开菜单，确保玩家已完全加载
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            plugin.getLogger().info("准备为玩家 " + player.getName() + " 打开铁砧菜单");
+            
+            // 使用异步+同步任务组合延迟打开菜单
+            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
                 if (player.isOnline() && !authMeApi.isAuthenticated(player)) {
-                    if (isRegistered) {
-                        // 打开登录菜单
-                        AnvilGUI.openLoginGUI(player);
-                    } else {
-                        // 打开注册菜单
-                        AnvilGUI.openRegisterGUI(player);
-                    }
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        if (player.isOnline() && !authMeApi.isAuthenticated(player)) {
+                            plugin.getLogger().info("开始为玩家 " + player.getName() + " 打开铁砧菜单");
+                            if (isRegistered) {
+                                AnvilGUI.openLoginGUI(player);
+                            } else {
+                                AnvilGUI.openRegisterGUI(player);
+                            }
+                        }
+                    });
                 }
-            }, 20L); // 1秒延迟
+            }, 40L); // 延迟2秒
         }
     }
     
