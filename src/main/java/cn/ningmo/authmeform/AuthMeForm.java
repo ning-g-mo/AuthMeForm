@@ -5,6 +5,7 @@ import cn.ningmo.authmeform.commands.LoginCommand;
 import cn.ningmo.authmeform.config.ConfigManager;
 import cn.ningmo.authmeform.listeners.InventoryListener;
 import cn.ningmo.authmeform.listeners.PlayerListener;
+import cn.ningmo.authmeform.listeners.InteractionListener;
 import cn.ningmo.authmeform.utils.MessageUtils;
 import fr.xephi.authme.api.v3.AuthMeApi;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -45,6 +46,7 @@ public class AuthMeForm extends JavaPlugin {
         // 注册事件监听器
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
+        getServer().getPluginManager().registerEvents(new InteractionListener(this), this);
         
         // 注册命令
         getCommand("authmeform").setExecutor(new MainCommand(this));

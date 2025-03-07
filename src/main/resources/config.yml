@@ -27,4 +27,8 @@ messages:
   
   # 自动登录相关
   auto_login: "&a您已被自动登录！"
-  auto_register: "&a您已被自动注册！密码为: &e%password%&a 请妥善保管" 
+  auto_register: "&a您已被自动注册！密码为: &e%password%&a 请妥善保管"
+  
+  # 需要登录/注册的提示
+  need_login: "&c请登录后再进行操作！使用 &f/login &c命令打开登录界面"
+  need_register: "&c请注册后再进行操作！使用 &f/register &c命令打开注册界面" 
