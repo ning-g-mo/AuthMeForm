@@ -33,23 +33,14 @@ public class AnvilGUI {
             Inventory inv = Bukkit.createInventory(player, InventoryType.ANVIL, MessageUtils.colorize(AuthMeForm.getInstance().getConfigManager().getMessage("login_title")));
             
             // 创建输入项（左边物品）
-            ItemStack inputItem = new ItemStack(Material.BARRIER);
+            ItemStack inputItem = new ItemStack(Material.NAME_TAG);
             ItemMeta meta = inputItem.getItemMeta();
-            meta.setDisplayName(MessageUtils.colorize("&c点击此处退出"));
+            meta.setDisplayName("");  // 空名称，用于输入密码
             List<String> lore = new ArrayList<>();
-            lore.add(MessageUtils.colorize("&7点击此处退出服务器"));
+            lore.add(MessageUtils.colorize("&7在此处输入您的密码"));
+            lore.add(MessageUtils.colorize("&7点击未改名的物品退出"));
             meta.setLore(lore);
             inputItem.setItemMeta(meta);
-            
-            // 创建输入框（中间物品）
-            ItemStack middleItem = new ItemStack(Material.NAME_TAG);
-            meta = middleItem.getItemMeta();
-            meta.setDisplayName("");
-            List<String> middleLore = new ArrayList<>();
-            middleLore.add(MessageUtils.colorize("&7在此处输入您的密码"));
-            middleLore.add(MessageUtils.colorize("&7然后点击右侧绿色确认按钮"));
-            meta.setLore(middleLore);
-            middleItem.setItemMeta(meta);
             
             // 创建提交按钮（输出位置物品提示）
             ItemStack resultItem = new ItemStack(Material.EMERALD);
@@ -64,7 +55,7 @@ public class AnvilGUI {
             // 设置物品 - 清除所有槽位后重新放置，确保铁砧是干净的
             inv.clear();
             inv.setItem(0, inputItem);  // 第一个输入槽
-            inv.setItem(1, middleItem);  // 第二个输入槽
+            inv.setItem(1, null);       // 第二个输入槽
             inv.setItem(2, resultItem); // 结果槽
             
             // 打开GUI
@@ -86,24 +77,15 @@ public class AnvilGUI {
         // 创建铁砧GUI
         Inventory inv = Bukkit.createInventory(player, InventoryType.ANVIL, MessageUtils.colorize(AuthMeForm.getInstance().getConfigManager().getMessage("register_title")));
         
-        // 创建退出按钮（左边物品）
-        ItemStack exitItem = new ItemStack(Material.BARRIER);
-        ItemMeta meta = exitItem.getItemMeta();
-        meta.setDisplayName(MessageUtils.colorize("&c点击此处退出"));
-        List<String> exitLore = new ArrayList<>();
-        exitLore.add(MessageUtils.colorize("&7点击此处退出服务器"));
-        meta.setLore(exitLore);
-        exitItem.setItemMeta(meta);
-        
-        // 创建输入框（中间物品）
-        ItemStack middleItem = new ItemStack(Material.NAME_TAG);
-        meta = middleItem.getItemMeta();
-        meta.setDisplayName("");
-        List<String> middleLore = new ArrayList<>();
-        middleLore.add(MessageUtils.colorize("&7在此处设置您的新密码"));
-        middleLore.add(MessageUtils.colorize("&7然后点击右侧绿色确认按钮"));
-        meta.setLore(middleLore);
-        middleItem.setItemMeta(meta);
+        // 创建输入项（左边物品）
+        ItemStack inputItem = new ItemStack(Material.NAME_TAG);
+        ItemMeta meta = inputItem.getItemMeta();
+        meta.setDisplayName("");  // 空名称，用于输入密码
+        List<String> lore = new ArrayList<>();
+        lore.add(MessageUtils.colorize("&7在此处设置您的密码"));
+        lore.add(MessageUtils.colorize("&7点击未改名的物品退出"));
+        meta.setLore(lore);
+        inputItem.setItemMeta(meta);
         
         // 创建确认按钮（右边物品）
         ItemStack confirmItem = new ItemStack(Material.EMERALD);
@@ -117,8 +99,8 @@ public class AnvilGUI {
         
         // 设置物品 - 清除所有槽位后重新放置
         inv.clear();
-        inv.setItem(0, exitItem);    // 左侧退出按钮
-        inv.setItem(1, middleItem);  // 中间输入框
+        inv.setItem(0, inputItem);   // 左侧输入框
+        inv.setItem(1, null);        // 中间槽位留空
         inv.setItem(2, confirmItem); // 右侧确认按钮
         
         // 打开GUI
@@ -182,22 +164,23 @@ public class AnvilGUI {
         // 清除玩家登录状态
         playersInLogin.remove(player.getUniqueId());
         
+        // 如果密码为空，不处理
+        if (password == null || password.trim().isEmpty()) {
+            return;
+        }
+        
         // 使用新的用户管理器验证密码
         try {
             boolean loginSuccess = AuthMeForm.getInstance().getUserManager().checkPassword(player.getName(), password);
             if (loginSuccess) {
                 // 创建会话
                 AuthMeForm.getInstance().getSessionManager().createSession(player);
-                AuthMeForm.getInstance().getLogger().info("玩家 " + player.getName() + " 成功通过铁砧菜单登录");
-                MessageUtils.sendMessage(player, "login_success");
                 // 清除登录尝试记录
                 AuthMeForm.getInstance().getLoginAttemptManager().clearAttempts(player);
-                // 设置一个标志表示登录成功，防止重新打开菜单
-                AuthMeForm.getInstance().debug("为玩家 " + player.getName() + " 设置登录成功标记");
+                MessageUtils.sendMessage(player, "login_success");
                 // 最后才关闭物品栏，确保状态已更新
                 player.closeInventory();
             } else {
-                AuthMeForm.getInstance().getLogger().info("玩家 " + player.getName() + " 通过铁砧登录失败：密码错误");
                 // 记录失败尝试
                 AuthMeForm.getInstance().getLoginAttemptManager().recordFailedAttempt(player);
                 MessageUtils.sendMessage(player, "login_failed");
@@ -218,20 +201,33 @@ public class AnvilGUI {
         // 清除玩家注册状态
         playersInRegister.remove(player.getUniqueId());
         
+        // 如果密码为空，不处理
+        if (password == null || password.trim().isEmpty()) {
+            return;
+        }
+        
+        // 检查密码长度
+        if (password.length() < AuthMeForm.getInstance().getConfigManager().getConfig().getInt("security.min_password_length", 6)) {
+            MessageUtils.sendMessage(player, "password_command.too_short");
+            player.closeInventory();
+            // 重新打开注册菜单
+            Bukkit.getScheduler().runTaskLater(AuthMeForm.getInstance(), () -> {
+                openRegisterGUI(player);
+            }, 20L);
+            return;
+        }
+        
         // 使用新的用户管理器注册
         try {
             boolean registerSuccess = AuthMeForm.getInstance().getUserManager().registerUser(player, password);
             if (registerSuccess) {
                 // 创建会话
                 AuthMeForm.getInstance().getSessionManager().createSession(player);
-                // 记录日志和清除登录尝试
-                AuthMeForm.getInstance().getLogger().info("玩家 " + player.getName() + " 成功通过铁砧菜单注册并自动登录");
                 AuthMeForm.getInstance().getLoginAttemptManager().clearAttempts(player);
                 MessageUtils.sendMessage(player, "register_success");
                 // 最后才关闭物品栏，确保状态已更新
                 player.closeInventory();
             } else {
-                AuthMeForm.getInstance().getLogger().info("玩家 " + player.getName() + " 通过铁砧注册失败");
                 MessageUtils.sendMessage(player, "register_error");
                 // 重新打开注册菜单
                 Bukkit.getScheduler().runTaskLater(AuthMeForm.getInstance(), () -> {

@@ -39,9 +39,9 @@ public class InventoryListener implements Listener {
             return;
         }
         
-        // 检查是否点击的是左侧退出按钮
-        if (event.getRawSlot() == 0 && event.getCurrentItem() != null && 
-            event.getCurrentItem().getType() == Material.BARRIER) {
+        // 检查是否点击的是未改名的物品
+        if (event.getCurrentItem() != null && event.getCurrentItem().hasItemMeta() && 
+            !event.getCurrentItem().getItemMeta().hasDisplayName()) {
             event.setCancelled(true);
             
             // 延迟一tick关闭物品栏
@@ -71,9 +71,6 @@ public class InventoryListener implements Listener {
             // 取消事件，防止物品被拿走
             event.setCancelled(true);
             
-            // 关闭玩家的物品栏
-            Bukkit.getScheduler().runTask(plugin, (Runnable)() -> player.closeInventory());
-            
             // 获取输出的文本
             String outputText = "";
             if (result.hasItemMeta() && result.getItemMeta().hasDisplayName()) {
@@ -82,21 +79,13 @@ public class InventoryListener implements Listener {
             
             // 处理铁砧GUI交互
             AnvilGUI.handleInventoryClick(player, outputText);
+            
+            // 关闭玩家的物品栏
+            Bukkit.getScheduler().runTask(plugin, (Runnable)() -> player.closeInventory());
         }
-        
-        // 允许玩家在第一个输入槽中放置物品
-        if (event.getRawSlot() == 0) {
-            // 如果已经有物品，不允许更改（保护退出按钮）
-            if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
-                event.setCancelled(true);
-            }
-        }
-        
-        // 其他情况，比如点击玩家物品栏等
-        // ...
     }
     
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         if (!(event.getPlayer() instanceof Player)) {
             return;
@@ -105,17 +94,8 @@ public class InventoryListener implements Listener {
         Player player = (Player) event.getPlayer();
         
         // 检查是否关闭了铁砧界面
-        if (event.getInventory().getType().name().equals("ANVIL")) {
+        if (event.getInventory().getType() == InventoryType.ANVIL) {
             AnvilGUI.handleInventoryClose(player, event);
-        }
-    }
-    
-    @EventHandler
-    public void onPrepareAnvil(PrepareAnvilEvent event) {
-        // 这个事件用于自定义铁砧的输出项
-        ItemStack result = event.getResult();
-        if (result != null && event.getView().getPlayer() instanceof Player) {
-            // 可以在这里修改铁砧的输出项，例如隐藏密码显示等
         }
     }
 } 
