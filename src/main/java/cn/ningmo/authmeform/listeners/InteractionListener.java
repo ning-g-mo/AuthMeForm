@@ -121,6 +121,7 @@ public class InteractionListener implements Listener {
             if (isRegistered) {
                 if (useAnvil) {
                     plugin.getLogger().info("为Java版玩家 " + player.getName() + " 打开铁砧登录菜单");
+                    MessageUtils.sendMessage(player, "login_anvil_help");
                     cn.ningmo.authmeform.gui.AnvilGUI.openLoginGUI(player);
                 } else {
                     plugin.getLogger().info("为Java版玩家 " + player.getName() + " 启动聊天登录");

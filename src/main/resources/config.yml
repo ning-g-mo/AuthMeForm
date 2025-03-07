@@ -18,6 +18,7 @@ messages:
   # 登录相关
   login_title: "&6登录"
   login_prompt: "&e请在此输入您的密码"
+  login_anvil_help: "&7在输入框中&l完全删除&r&7现有文本，输入您的密码，然后点击右侧绿宝石确认"
   login_message: "&a请在铁砧中输入您的密码来登录"
   login_success: "&a登录成功！"
   login_cancelled: "&c登录操作已取消，请重新尝试"

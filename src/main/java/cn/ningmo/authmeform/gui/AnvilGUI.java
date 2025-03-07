@@ -11,7 +11,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -30,14 +32,27 @@ public class AnvilGUI {
             // 创建铁砧GUI
             Inventory inv = Bukkit.createInventory(player, InventoryType.ANVIL, MessageUtils.colorize(AuthMeForm.getInstance().getConfigManager().getMessage("login_title")));
             
-            // 创建提示物品
-            ItemStack paper = new ItemStack(Material.PAPER);
-            ItemMeta meta = paper.getItemMeta();
-            meta.setDisplayName(MessageUtils.colorize(AuthMeForm.getInstance().getConfigManager().getMessage("login_prompt")));
-            paper.setItemMeta(meta);
+            // 创建输入项（左边物品）
+            ItemStack inputItem = new ItemStack(Material.NAME_TAG);
+            ItemMeta meta = inputItem.getItemMeta();
+            meta.setDisplayName("");
+            inputItem.setItemMeta(meta);
             
-            // 放置物品
-            inv.setItem(0, paper);
+            // 创建提交按钮（输出位置物品提示）
+            ItemStack resultItem = new ItemStack(Material.EMERALD);
+            meta = resultItem.getItemMeta();
+            meta.setDisplayName(MessageUtils.colorize("&a点击此处确认"));
+            List<String> lore = new ArrayList<>();
+            lore.add(MessageUtils.colorize("&7在上方输入框输入您的密码"));
+            lore.add(MessageUtils.colorize("&7然后点击这里完成登录"));
+            meta.setLore(lore);
+            resultItem.setItemMeta(meta);
+            
+            // 设置物品 - 清除所有槽位后重新放置，确保铁砧是干净的
+            inv.clear();
+            inv.setItem(0, inputItem);  // 第一个输入槽
+            inv.setItem(1, null);       // 第二个输入槽
+            inv.setItem(2, resultItem); // 结果槽
             
             // 打开GUI
             player.openInventory(inv);
@@ -89,6 +104,11 @@ public class AnvilGUI {
             playersInLogin.remove(playerUUID);
             // 用户关闭了登录窗口，发送退出消息
             MessageUtils.sendMessage(player, "login_cancelled");
+            
+            // 检查是否是被插件本身关闭的GUI (例如登录成功后)
+            if (AuthMeForm.getInstance().getSessionManager().isAuthenticated(player)) {
+                return; // 如果已登录，不要重新打开菜单
+            }
             
             // 延迟重新打开登录菜单，使用随机延迟避免与其他插件冲突
             int delay = 10 + (int)(Math.random() * 10); // 0.5-1秒的随机延迟
