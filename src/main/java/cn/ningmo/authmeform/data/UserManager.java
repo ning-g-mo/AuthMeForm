@@ -35,31 +35,33 @@ public class UserManager {
         if (cachedUsers.containsKey(uuid)) {
             return true;
         }
-        for (File file : dataFolder.listFiles()) {
-            if (file.isFile() && file.getName().endsWith(".yml")) {
-                FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-                if (uuid.toString().equals(config.getString("uuid"))) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        
+        // 使用预加载的用户名到UUID映射进行快速查找
+        return usernameToUuid.containsValue(uuid);
     }
     
     public UserData loadUser(String username) {
+        String lowerUsername = username.toLowerCase();
+        UUID uuid = usernameToUuid.get(lowerUsername);
+        
+        // 如果在缓存中找到UUID，检查是否已加载用户数据
+        if (uuid != null && cachedUsers.containsKey(uuid)) {
+            return cachedUsers.get(uuid);
+        }
+        
         File userFile = getUserFile(username);
         if (!userFile.exists()) {
             return null;
         }
         
         FileConfiguration config = YamlConfiguration.loadConfiguration(userFile);
-        UUID uuid = UUID.fromString(config.getString("uuid"));
+        UUID userUuid = UUID.fromString(config.getString("uuid"));
         String hashedPassword = config.getString("password");
         String salt = config.getString("salt");
         long lastLogin = config.getLong("last_login", 0);
         
-        UserData userData = new UserData(username, uuid, hashedPassword, salt, lastLogin);
-        cachedUsers.put(uuid, userData);
+        UserData userData = new UserData(username, userUuid, hashedPassword, salt, lastLogin);
+        cachedUsers.put(userUuid, userData);
         return userData;
     }
     

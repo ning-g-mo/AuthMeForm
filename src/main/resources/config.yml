@@ -41,4 +41,19 @@ messages:
   chat_register_prompt: "&a请在聊天框中直接输入您的密码来注册"
   login_failed: "&c密码错误，请重新输入"
   register_error: "&c注册失败，请重新尝试"
-  login_error: "&c登录时出错，请重新尝试" 
+  login_error: "&c登录时出错，请重新尝试"
+  
+  # 密码命令相关
+  password_command:
+    success: "&a密码修改成功！"
+    old_password_wrong: "&c旧密码错误！"
+    too_short: "&c新密码太短，至少需要%min_length%个字符！"
+    too_weak: "&c密码强度不足！请包含数字和特殊字符。"
+    strength: "&7密码强度: %strength%"
+
+# 安全设置
+security:
+  max_login_attempts: 5      # 最大登录尝试次数
+  lockout_duration: 300000   # 锁定时间（毫秒），默认5分钟
+  min_password_length: 6     # 密码最小长度
+  enforce_password_strength: true  # 是否强制密码强度 

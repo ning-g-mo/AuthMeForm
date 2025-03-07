@@ -11,14 +11,27 @@ public class SessionManager {
     
     private final AuthMeForm plugin;
     private final Map<UUID, Session> sessions = new HashMap<>();
+    private final Map<UUID, Boolean> authStatusCache = new HashMap<>();
+    private long lastCleanupTime = System.currentTimeMillis();
     
     public SessionManager(AuthMeForm plugin) {
         this.plugin = plugin;
     }
     
     public boolean isAuthenticated(UUID uuid) {
+        // 首先检查缓存
+        Boolean status = authStatusCache.get(uuid);
+        if (status != null) {
+            return status;
+        }
+        
+        // 缓存未命中，检查会话
         Session session = sessions.get(uuid);
-        return session != null && session.isValid();
+        boolean authenticated = session != null && session.isValid();
+        
+        // 缓存结果
+        authStatusCache.put(uuid, authenticated);
+        return authenticated;
     }
     
     public boolean isAuthenticated(Player player) {
@@ -36,6 +49,7 @@ public class SessionManager {
     
     public void destroySession(UUID uuid) {
         sessions.remove(uuid);
+        authStatusCache.remove(uuid); // 同时清理缓存
     }
     
     public void clearSessions() {
@@ -45,6 +59,17 @@ public class SessionManager {
     // 定期清理过期会话的方法
     public void cleanupSessions() {
         long now = System.currentTimeMillis();
+        // 每隔60秒才真正执行清理，减少资源消耗
+        if (now - lastCleanupTime < 60000) {
+            return;
+        }
+        
+        // 清理过期会话
         sessions.entrySet().removeIf(entry -> !entry.getValue().isValid(now));
+        
+        // 清空状态缓存
+        authStatusCache.clear();
+        
+        lastCleanupTime = now;
     }
 } 

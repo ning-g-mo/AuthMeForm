@@ -51,6 +51,15 @@ public class PasswordCommand implements CommandExecutor {
             return true;
         }
         
+        // 添加密码强度检查
+        int strength = PasswordUtils.checkPasswordStrength(newPassword);
+        player.sendMessage("§7密码强度: " + PasswordUtils.getStrengthDescription(strength));
+
+        if (strength < 2 && !player.hasPermission("authmeform.admin")) {
+            player.sendMessage("§c密码强度不足！请包含数字和特殊字符，并且长度至少8位。");
+            return true;
+        }
+        
         // 更新密码
         UserData userData = plugin.getUserManager().loadUser(player.getName());
         String salt = PasswordUtils.generateSalt();

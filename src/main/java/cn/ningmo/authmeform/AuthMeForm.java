@@ -7,6 +7,7 @@ import cn.ningmo.authmeform.config.ConfigManager;
 import cn.ningmo.authmeform.data.UserManager;
 import cn.ningmo.authmeform.listeners.*;
 import cn.ningmo.authmeform.session.SessionManager;
+import cn.ningmo.authmeform.security.LoginAttemptManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -20,6 +21,7 @@ public class AuthMeForm extends JavaPlugin {
     private boolean floodgateEnabled = false;
     private ChatLoginListener chatLoginListener;
     private BukkitTask sessionCleanupTask;
+    private LoginAttemptManager loginAttemptManager;
 
     @Override
     public void onEnable() {
@@ -46,6 +48,9 @@ public class AuthMeForm extends JavaPlugin {
         
         // 初始化聊天登录监听器
         chatLoginListener = new ChatLoginListener(this);
+        
+        // 初始化登录尝试管理器
+        loginAttemptManager = new LoginAttemptManager(this);
         
         // 注册事件监听器
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
@@ -103,5 +108,9 @@ public class AuthMeForm extends JavaPlugin {
     
     public ChatLoginListener getChatLoginListener() {
         return chatLoginListener;
+    }
+    
+    public LoginAttemptManager getLoginAttemptManager() {
+        return loginAttemptManager;
     }
 } 
