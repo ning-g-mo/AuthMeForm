@@ -34,17 +34,10 @@ public class AnvilGUI {
             
             // 创建输入项（左边物品）
             ItemStack inputItem = new ItemStack(Material.NAME_TAG);
-            ItemMeta meta = inputItem.getItemMeta();
-            meta.setDisplayName("");  // 空名称，用于输入密码
-            List<String> lore = new ArrayList<>();
-            lore.add(MessageUtils.colorize("&7在此处输入您的密码"));
-            lore.add(MessageUtils.colorize("&7点击未改名的物品退出"));
-            meta.setLore(lore);
-            inputItem.setItemMeta(meta);
             
             // 创建提交按钮（输出位置物品提示）
             ItemStack resultItem = new ItemStack(Material.EMERALD);
-            meta = resultItem.getItemMeta();
+            ItemMeta meta = resultItem.getItemMeta();
             meta.setDisplayName(MessageUtils.colorize("&a点击此处确认"));
             List<String> resultLore = new ArrayList<>();
             resultLore.add(MessageUtils.colorize("&7在输入框中输入您的密码"));
@@ -79,17 +72,10 @@ public class AnvilGUI {
         
         // 创建输入项（左边物品）
         ItemStack inputItem = new ItemStack(Material.NAME_TAG);
-        ItemMeta meta = inputItem.getItemMeta();
-        meta.setDisplayName("");  // 空名称，用于输入密码
-        List<String> lore = new ArrayList<>();
-        lore.add(MessageUtils.colorize("&7在此处设置您的密码"));
-        lore.add(MessageUtils.colorize("&7点击未改名的物品退出"));
-        meta.setLore(lore);
-        inputItem.setItemMeta(meta);
         
         // 创建确认按钮（右边物品）
         ItemStack confirmItem = new ItemStack(Material.EMERALD);
-        meta = confirmItem.getItemMeta();
+        ItemMeta meta = confirmItem.getItemMeta();
         meta.setDisplayName(MessageUtils.colorize("&a点击此处确认"));
         List<String> confirmLore = new ArrayList<>();
         confirmLore.add(MessageUtils.colorize("&7在输入框中设置您的密码"));
