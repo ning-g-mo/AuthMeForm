@@ -125,8 +125,14 @@ public class AnvilGUI {
             if (loginSuccess) {
                 // 创建会话
                 AuthMeForm.getInstance().getSessionManager().createSession(player);
+                AuthMeForm.getInstance().getLogger().info("玩家 " + player.getName() + " 成功通过铁砧菜单登录");
                 MessageUtils.sendMessage(player, "login_success");
+                // 清除登录尝试记录
+                AuthMeForm.getInstance().getLoginAttemptManager().clearAttempts(player);
             } else {
+                AuthMeForm.getInstance().getLogger().info("玩家 " + player.getName() + " 通过铁砧登录失败：密码错误");
+                // 记录失败尝试
+                AuthMeForm.getInstance().getLoginAttemptManager().recordFailedAttempt(player);
                 MessageUtils.sendMessage(player, "login_failed");
                 // 重新打开登录菜单
                 Bukkit.getScheduler().runTaskLater(AuthMeForm.getInstance(), () -> {

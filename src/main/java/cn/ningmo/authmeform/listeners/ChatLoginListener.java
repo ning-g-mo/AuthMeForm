@@ -74,8 +74,14 @@ public class ChatLoginListener implements Listener {
             if (loginSuccess) {
                 // 创建会话
                 plugin.getSessionManager().createSession(player);
+                plugin.getLogger().info("玩家 " + player.getName() + " 成功通过聊天框登录");
                 MessageUtils.sendMessage(player, "login_success");
+                // 清除登录尝试记录
+                plugin.getLoginAttemptManager().clearAttempts(player);
             } else {
+                plugin.getLogger().info("玩家 " + player.getName() + " 登录失败：密码错误");
+                // 记录失败尝试
+                plugin.getLoginAttemptManager().recordFailedAttempt(player);
                 MessageUtils.sendMessage(player, "login_failed");
                 startChatLogin(player); // 登录失败，重新提示
             }
@@ -95,8 +101,10 @@ public class ChatLoginListener implements Listener {
             if (registerSuccess) {
                 // 创建会话
                 plugin.getSessionManager().createSession(player);
+                plugin.getLogger().info("玩家 " + player.getName() + " 成功通过聊天框注册并自动登录");
                 MessageUtils.sendMessage(player, "register_success");
             } else {
+                plugin.getLogger().info("玩家 " + player.getName() + " 注册失败");
                 MessageUtils.sendMessage(player, "register_error");
                 startChatRegister(player); // 注册失败，重新提示
             }

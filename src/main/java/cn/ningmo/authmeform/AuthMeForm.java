@@ -66,7 +66,10 @@ public class AuthMeForm extends JavaPlugin {
         
         // 启动会话清理任务
         sessionCleanupTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, 
-                () -> sessionManager.cleanupSessions(), 1200L, 1200L); // 每分钟清理一次
+                () -> {
+                    sessionManager.cleanupSessions();
+                    loginAttemptManager.cleanup();
+                }, 1200L, 1200L); // 每分钟清理一次
         
         getLogger().info("AuthMeForm 插件已成功加载！");
     }

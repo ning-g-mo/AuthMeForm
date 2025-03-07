@@ -43,8 +43,15 @@ public class SessionManager {
         Session session = new Session(uuid, plugin.getConfigManager().getSessionTimeout());
         sessions.put(uuid, session);
         
+        // 强制更新认证状态缓存为已认证
+        authStatusCache.put(uuid, true);
+        
         // 更新最后登录时间
         plugin.getUserManager().updateLastLogin(uuid);
+        
+        // 记录会话创建日志
+        plugin.getLogger().info("为玩家 " + player.getName() + " 创建新会话，有效期: " + 
+            (plugin.getConfigManager().getSessionTimeout() / 60000) + " 分钟");
     }
     
     public void destroySession(UUID uuid) {

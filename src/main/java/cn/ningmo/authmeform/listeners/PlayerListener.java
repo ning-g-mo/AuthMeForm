@@ -35,6 +35,12 @@ public class PlayerListener implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
+                // 如果玩家已经登录，不需要处理
+                if (plugin.getSessionManager().isAuthenticated(player)) {
+                    plugin.getLogger().info("玩家 " + player.getName() + " 已登录，无需再次认证");
+                    return;
+                }
+                
                 boolean isRegistered = plugin.getUserManager().isRegistered(player.getName());
                 
                 // 检查是否是基岩版玩家

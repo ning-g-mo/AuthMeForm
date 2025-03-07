@@ -67,6 +67,8 @@ public class InteractionListener implements Listener {
     private void handlePlayerInteraction(Player player) {
         // 检查玩家是否已登录
         if (plugin.getSessionManager().isAuthenticated(player)) {
+            // 清除可能存在的冷却记录，确保登录状态下没有冷却记录
+            lastMenuShownTime.remove(player.getUniqueId());
             return;
         }
         
@@ -75,7 +77,8 @@ public class InteractionListener implements Listener {
         long currentTime = System.currentTimeMillis();
         Long lastShownTime = lastMenuShownTime.get(playerUUID);
         
-        if (lastShownTime != null && (currentTime - lastShownTime) < MENU_COOLDOWN) {
+        // 增加冷却时间，从5秒改为10秒，减少干扰
+        if (lastShownTime != null && (currentTime - lastShownTime) < 10000) {
             return; // 冷却时间内，不重复显示菜单
         }
         
