@@ -2,6 +2,7 @@ package cn.ningmo.authmeform;
 
 import cn.ningmo.authmeform.commands.MainCommand;
 import cn.ningmo.authmeform.config.ConfigManager;
+import cn.ningmo.authmeform.listeners.InventoryListener;
 import cn.ningmo.authmeform.listeners.PlayerListener;
 import cn.ningmo.authmeform.utils.MessageUtils;
 import fr.xephi.authme.api.v3.AuthMeApi;
@@ -42,6 +43,7 @@ public class AuthMeForm extends JavaPlugin {
         
         // 注册事件监听器
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         
         // 注册命令
         getCommand("authmeform").setExecutor(new MainCommand(this));
