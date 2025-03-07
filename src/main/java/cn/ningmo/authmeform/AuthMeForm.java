@@ -6,6 +6,7 @@ import cn.ningmo.authmeform.config.ConfigManager;
 import cn.ningmo.authmeform.listeners.InventoryListener;
 import cn.ningmo.authmeform.listeners.PlayerListener;
 import cn.ningmo.authmeform.listeners.InteractionListener;
+import cn.ningmo.authmeform.listeners.ChatLoginListener;
 import cn.ningmo.authmeform.utils.MessageUtils;
 import fr.xephi.authme.api.v3.AuthMeApi;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,6 +17,7 @@ public class AuthMeForm extends JavaPlugin {
     private ConfigManager configManager;
     private AuthMeApi authMeApi;
     private boolean floodgateEnabled = false;
+    private ChatLoginListener chatLoginListener;
 
     @Override
     public void onEnable() {
@@ -43,10 +45,14 @@ public class AuthMeForm extends JavaPlugin {
         configManager = new ConfigManager(this);
         configManager.loadConfig();
         
+        // 初始化聊天登录监听器
+        chatLoginListener = new ChatLoginListener(this);
+        
         // 注册事件监听器
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         getServer().getPluginManager().registerEvents(new InteractionListener(this), this);
+        getServer().getPluginManager().registerEvents(chatLoginListener, this);
         
         // 注册命令
         getCommand("authmeform").setExecutor(new MainCommand(this));
@@ -74,5 +80,9 @@ public class AuthMeForm extends JavaPlugin {
     
     public boolean isFloodgateEnabled() {
         return floodgateEnabled;
+    }
+    
+    public ChatLoginListener getChatLoginListener() {
+        return chatLoginListener;
     }
 } 

@@ -111,14 +111,14 @@ public class InteractionListener implements Listener {
                 plugin.getLogger().info("为基岩版玩家 " + player.getName() + " 打开注册表单");
                 cn.ningmo.authmeform.gui.BedrockFormGUI.openRegisterForm(player);
             }
-        } else if (plugin.getConfigManager().isJavaAnvilEnabled()) {
-            // Java版玩家，显示铁砧菜单
+        } else {
+            // Java版玩家，尝试使用聊天登录
             if (isRegistered) {
-                plugin.getLogger().info("为Java版玩家 " + player.getName() + " 打开登录菜单");
-                AnvilGUI.openLoginGUI(player);
+                plugin.getLogger().info("为Java版玩家 " + player.getName() + " 启动聊天登录");
+                plugin.getChatLoginListener().startChatLogin(player);
             } else {
-                plugin.getLogger().info("为Java版玩家 " + player.getName() + " 打开注册菜单");
-                AnvilGUI.openRegisterGUI(player);
+                plugin.getLogger().info("为Java版玩家 " + player.getName() + " 启动聊天注册");
+                plugin.getChatLoginListener().startChatRegister(player);
             }
         }
     }

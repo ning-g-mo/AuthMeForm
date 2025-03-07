@@ -2,6 +2,7 @@ package cn.ningmo.authmeform.commands;
 
 import cn.ningmo.authmeform.AuthMeForm;
 import cn.ningmo.authmeform.gui.AnvilGUI;
+import cn.ningmo.authmeform.listeners.ChatLoginListener;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -29,10 +30,15 @@ public class LoginCommand implements CommandExecutor {
             return true;
         }
         
+        // 获取聊天登录监听器
+        ChatLoginListener chatListener = plugin.getChatLoginListener();
+        
         if (plugin.getAuthMeApi().isRegistered(player.getName())) {
-            AnvilGUI.openLoginGUI(player);
+            // 使用聊天框登录
+            chatListener.startChatLogin(player);
         } else {
-            AnvilGUI.openRegisterGUI(player);
+            // 使用聊天框注册
+            chatListener.startChatRegister(player);
         }
         
         return true;

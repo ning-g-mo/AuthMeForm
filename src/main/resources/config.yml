@@ -31,4 +31,11 @@ messages:
   
   # 需要登录/注册的提示
   need_login: "&c请登录后再进行操作！使用 &f/login &c命令打开登录界面"
-  need_register: "&c请注册后再进行操作！使用 &f/register &c命令打开注册界面" 
+  need_register: "&c请注册后再进行操作！使用 &f/register &c命令打开注册界面"
+  
+  # 聊天登录相关
+  chat_login_prompt: "&a请在聊天框中直接输入您的密码来登录"
+  chat_register_prompt: "&a请在聊天框中直接输入您的密码来注册"
+  login_failed: "&c密码错误，请重新输入"
+  register_error: "&c注册失败，请重新尝试"
+  login_error: "&c登录时出错，请重新尝试" 
