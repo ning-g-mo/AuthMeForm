@@ -14,6 +14,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.geysermc.floodgate.api.FloodgateApi;
+import fr.xephi.authme.events.LoginEvent;
+import fr.xephi.authme.events.RegisterEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -172,5 +174,17 @@ public class PlayerListener implements Listener {
     
     public void setPlayerAuthenticated(UUID playerUUID) {
         playersInAuthProcess.remove(playerUUID);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onAuthMeLogin(LoginEvent event) {
+        // 玩家已登录，从认证过程中移除
+        setPlayerAuthenticated(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onAuthMeRegister(RegisterEvent event) {
+        // 玩家已注册，从认证过程中移除
+        setPlayerAuthenticated(event.getPlayer().getUniqueId());
     }
 } 

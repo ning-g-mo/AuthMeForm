@@ -119,11 +119,24 @@ public class AnvilGUI {
         // 关闭物品栏
         player.closeInventory();
         
-        // 使用AuthMe API执行登录
-        AuthMeForm.getInstance().getAuthMeApi().forceLogin(player);
-        
-        // 发送成功消息
-        MessageUtils.sendMessage(player, "login_success");
+        // 使用AuthMe API执行登录验证
+        // 注意：forceLogin会跳过密码验证，这可能不是你想要的
+        try {
+            boolean loginSuccess = AuthMeForm.getInstance().getAuthMeApi().checkPassword(player.getName(), password);
+            if (loginSuccess) {
+                AuthMeForm.getInstance().getAuthMeApi().forceLogin(player);
+                MessageUtils.sendMessage(player, "login_success");
+            } else {
+                MessageUtils.sendMessage(player, "login_failed");
+                // 重新打开登录菜单
+                Bukkit.getScheduler().runTaskLater(AuthMeForm.getInstance(), () -> {
+                    openLoginGUI(player);
+                }, 20L);
+            }
+        } catch (Exception e) {
+            AuthMeForm.getInstance().getLogger().severe("登录时发生错误: " + e.getMessage());
+            MessageUtils.sendMessage(player, "login_error");
+        }
     }
     
     private static void handleRegister(Player player, String password) {
