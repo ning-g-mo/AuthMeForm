@@ -55,7 +55,7 @@ jobs:
         with:
           files: target/AuthMeForm-${{ env.VERSION }}.jar
           name: AuthMeForm ${{ env.VERSION }}
-          tag_name: ${{ github.ref_name == 'main' || github.ref_name == 'master' ? format('build-{0}', github.run_number) : github.ref_name }}
+          tag_name: ${{ (github.ref_name == 'main' || github.ref_name == 'master') && format('build-{0}', github.run_number) || github.ref_name }}
           prerelease: ${{ env.RELEASE_TYPE == 'prerelease' }}
           draft: false
           generate_release_notes: true
