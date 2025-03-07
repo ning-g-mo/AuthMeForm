@@ -27,4 +27,4 @@ messages:
   
   # 自动登录相关
   auto_login: "&a您已被自动登录！"
-  auto_register: "&a您已被自动注册！" 
+  auto_register: "&a您已被自动注册！密码为: &e%password%&a 请妥善保管" 
