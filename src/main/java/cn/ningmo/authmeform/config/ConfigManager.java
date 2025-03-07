@@ -61,6 +61,11 @@ public class ConfigManager {
         return config.getBoolean("bedrock_auto_register", false);
     }
     
+    public long getSessionTimeout() {
+        // 默认30分钟会话超时
+        return config.getLong("session_timeout", 1800000);
+    }
+    
     public String getMessage(String path) {
         return config.getString("messages." + path, "消息未配置");
     }

@@ -1,37 +1,29 @@
 package cn.ningmo.authmeform;
 
-import cn.ningmo.authmeform.commands.MainCommand;
 import cn.ningmo.authmeform.commands.LoginCommand;
+import cn.ningmo.authmeform.commands.MainCommand;
+import cn.ningmo.authmeform.commands.PasswordCommand;
 import cn.ningmo.authmeform.config.ConfigManager;
-import cn.ningmo.authmeform.listeners.InventoryListener;
-import cn.ningmo.authmeform.listeners.PlayerListener;
-import cn.ningmo.authmeform.listeners.InteractionListener;
-import cn.ningmo.authmeform.listeners.ChatLoginListener;
-import cn.ningmo.authmeform.utils.MessageUtils;
-import fr.xephi.authme.api.v3.AuthMeApi;
+import cn.ningmo.authmeform.data.UserManager;
+import cn.ningmo.authmeform.listeners.*;
+import cn.ningmo.authmeform.session.SessionManager;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 public class AuthMeForm extends JavaPlugin {
     
     private static AuthMeForm instance;
     private ConfigManager configManager;
-    private AuthMeApi authMeApi;
+    private UserManager userManager;
+    private SessionManager sessionManager;
     private boolean floodgateEnabled = false;
     private ChatLoginListener chatLoginListener;
+    private BukkitTask sessionCleanupTask;
 
     @Override
     public void onEnable() {
         instance = this;
-        
-        // 检查AuthMe是否已安装
-        if (getServer().getPluginManager().getPlugin("AuthMe") == null) {
-            getLogger().severe("未找到AuthMe插件，AuthMeForm插件无法工作！");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-        
-        // 获取AuthMe API
-        authMeApi = AuthMeApi.getInstance();
         
         // 检查Floodgate是否已安装
         if (getServer().getPluginManager().getPlugin("floodgate") != null) {
@@ -45,6 +37,13 @@ public class AuthMeForm extends JavaPlugin {
         configManager = new ConfigManager(this);
         configManager.loadConfig();
         
+        // 初始化用户管理器
+        userManager = new UserManager(this);
+        userManager.preloadUserData();
+        
+        // 初始化会话管理器
+        sessionManager = new SessionManager(this);
+        
         // 初始化聊天登录监听器
         chatLoginListener = new ChatLoginListener(this);
         
@@ -53,16 +52,32 @@ public class AuthMeForm extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         getServer().getPluginManager().registerEvents(new InteractionListener(this), this);
         getServer().getPluginManager().registerEvents(chatLoginListener, this);
+        getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
         
         // 注册命令
         getCommand("authmeform").setExecutor(new MainCommand(this));
         getCommand("login").setExecutor(new LoginCommand(this));
+        getCommand("changepassword").setExecutor(new PasswordCommand(this));
+        
+        // 启动会话清理任务
+        sessionCleanupTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, 
+                () -> sessionManager.cleanupSessions(), 1200L, 1200L); // 每分钟清理一次
         
         getLogger().info("AuthMeForm 插件已成功加载！");
     }
 
     @Override
     public void onDisable() {
+        if (sessionCleanupTask != null) {
+            sessionCleanupTask.cancel();
+        }
+        
+        // 保存所有用户数据
+        userManager.clearCache();
+        
+        // 清理所有会话
+        sessionManager.clearSessions();
+        
         getLogger().info("AuthMeForm 插件已卸载！");
     }
     
@@ -74,8 +89,12 @@ public class AuthMeForm extends JavaPlugin {
         return configManager;
     }
     
-    public AuthMeApi getAuthMeApi() {
-        return authMeApi;
+    public UserManager getUserManager() {
+        return userManager;
+    }
+    
+    public SessionManager getSessionManager() {
+        return sessionManager;
     }
     
     public boolean isFloodgateEnabled() {

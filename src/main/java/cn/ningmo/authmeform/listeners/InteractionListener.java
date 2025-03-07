@@ -66,7 +66,7 @@ public class InteractionListener implements Listener {
     
     private void handlePlayerInteraction(Player player) {
         // 检查玩家是否已登录
-        if (plugin.getAuthMeApi().isAuthenticated(player)) {
+        if (plugin.getSessionManager().isAuthenticated(player)) {
             return;
         }
         
@@ -83,7 +83,7 @@ public class InteractionListener implements Listener {
         lastMenuShownTime.put(playerUUID, currentTime);
         
         // 根据玩家类型处理
-        boolean isRegistered = plugin.getAuthMeApi().isRegistered(player.getName());
+        boolean isRegistered = plugin.getUserManager().isRegistered(player.getName());
         boolean isBedrockPlayer = false;
         
         if (plugin.isFloodgateEnabled()) {

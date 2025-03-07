@@ -93,7 +93,7 @@ public class AnvilGUI {
             // 延迟重新打开登录菜单，使用随机延迟避免与其他插件冲突
             int delay = 10 + (int)(Math.random() * 10); // 0.5-1秒的随机延迟
             Bukkit.getScheduler().runTaskLater(AuthMeForm.getInstance(), () -> {
-                if (player.isOnline() && !AuthMeForm.getInstance().getAuthMeApi().isAuthenticated(player)) {
+                if (player.isOnline() && !AuthMeForm.getInstance().getSessionManager().isAuthenticated(player)) {
                     openLoginGUI(player);
                 }
             }, delay);
@@ -105,7 +105,7 @@ public class AnvilGUI {
             // 延迟重新打开注册菜单，使用随机延迟
             int delay = 10 + (int)(Math.random() * 10);
             Bukkit.getScheduler().runTaskLater(AuthMeForm.getInstance(), () -> {
-                if (player.isOnline() && !AuthMeForm.getInstance().getAuthMeApi().isRegistered(player.getName())) {
+                if (player.isOnline() && !AuthMeForm.getInstance().getSessionManager().isAuthenticated(player)) {
                     openRegisterGUI(player);
                 }
             }, delay);
@@ -119,12 +119,12 @@ public class AnvilGUI {
         // 关闭物品栏
         player.closeInventory();
         
-        // 使用AuthMe API执行登录验证
-        // 注意：forceLogin会跳过密码验证，这可能不是你想要的
+        // 使用新的用户管理器验证密码
         try {
-            boolean loginSuccess = AuthMeForm.getInstance().getAuthMeApi().checkPassword(player.getName(), password);
+            boolean loginSuccess = AuthMeForm.getInstance().getUserManager().checkPassword(player.getName(), password);
             if (loginSuccess) {
-                AuthMeForm.getInstance().getAuthMeApi().forceLogin(player);
+                // 创建会话
+                AuthMeForm.getInstance().getSessionManager().createSession(player);
                 MessageUtils.sendMessage(player, "login_success");
             } else {
                 MessageUtils.sendMessage(player, "login_failed");
@@ -146,11 +146,23 @@ public class AnvilGUI {
         // 关闭物品栏
         player.closeInventory();
         
-        // 使用AuthMe API执行注册
-        AuthMeForm.getInstance().getAuthMeApi().registerPlayer(player.getName(), password);
-        AuthMeForm.getInstance().getAuthMeApi().forceLogin(player);
-        
-        // 发送成功消息
-        MessageUtils.sendMessage(player, "register_success");
+        // 使用新的用户管理器注册
+        try {
+            boolean registerSuccess = AuthMeForm.getInstance().getUserManager().registerUser(player, password);
+            if (registerSuccess) {
+                // 创建会话
+                AuthMeForm.getInstance().getSessionManager().createSession(player);
+                MessageUtils.sendMessage(player, "register_success");
+            } else {
+                MessageUtils.sendMessage(player, "register_error");
+                // 重新打开注册菜单
+                Bukkit.getScheduler().runTaskLater(AuthMeForm.getInstance(), () -> {
+                    openRegisterGUI(player);
+                }, 20L);
+            }
+        } catch (Exception e) {
+            AuthMeForm.getInstance().getLogger().severe("注册时发生错误: " + e.getMessage());
+            MessageUtils.sendMessage(player, "register_error");
+        }
     }
 } 

@@ -3,10 +3,11 @@ version: ${project.version}
 main: cn.ningmo.authmeform.AuthMeForm
 api-version: '1.18'
 authors: [ning_mo]
-description: 为AuthMe提供表单界面
+description: 提供简单易用的登录和注册表单界面
 website: https://github.com/ning-g-mo
 
-depend: [AuthMe]
+# 删除AuthMe依赖
+# depend: [AuthMe]
 softdepend: [floodgate]
 
 commands:
@@ -18,6 +19,10 @@ commands:
     description: 打开登录/注册界面
     usage: /login
     aliases: [l, reg, register]
+  changepassword:
+    description: 修改密码
+    usage: /changepassword <旧密码> <新密码>
+    aliases: [changepw, cpw]
 
 permissions:
   authmeform.use:

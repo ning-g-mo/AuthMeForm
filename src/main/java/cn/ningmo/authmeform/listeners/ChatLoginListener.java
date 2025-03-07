@@ -27,7 +27,7 @@ public class ChatLoginListener implements Listener {
         UUID uuid = player.getUniqueId();
         
         // 如果玩家已经登录，不需要处理
-        if (plugin.getAuthMeApi().isAuthenticated(player)) {
+        if (plugin.getSessionManager().isAuthenticated(player)) {
             return;
         }
         
@@ -70,9 +70,10 @@ public class ChatLoginListener implements Listener {
      */
     private void handleLogin(Player player, String password) {
         try {
-            boolean loginSuccess = plugin.getAuthMeApi().checkPassword(player.getName(), password);
+            boolean loginSuccess = plugin.getUserManager().checkPassword(player.getName(), password);
             if (loginSuccess) {
-                plugin.getAuthMeApi().forceLogin(player);
+                // 创建会话
+                plugin.getSessionManager().createSession(player);
                 MessageUtils.sendMessage(player, "login_success");
             } else {
                 MessageUtils.sendMessage(player, "login_failed");
@@ -89,9 +90,16 @@ public class ChatLoginListener implements Listener {
      */
     private void handleRegister(Player player, String password) {
         try {
-            plugin.getAuthMeApi().registerPlayer(player.getName(), password);
-            plugin.getAuthMeApi().forceLogin(player);
-            MessageUtils.sendMessage(player, "register_success");
+            // 注册玩家
+            boolean registerSuccess = plugin.getUserManager().registerUser(player, password);
+            if (registerSuccess) {
+                // 创建会话
+                plugin.getSessionManager().createSession(player);
+                MessageUtils.sendMessage(player, "register_success");
+            } else {
+                MessageUtils.sendMessage(player, "register_error");
+                startChatRegister(player); // 注册失败，重新提示
+            }
         } catch (Exception e) {
             plugin.getLogger().severe("聊天注册时发生错误: " + e.getMessage());
             MessageUtils.sendMessage(player, "register_error");

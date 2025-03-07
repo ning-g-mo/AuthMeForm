@@ -24,11 +24,6 @@
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
-        <!-- AuthMe 仓库 -->
-        <repository>
-            <id>codemc-repo</id>
-            <url>https://repo.codemc.org/repository/maven-public/</url>
-        </repository>
         <!-- Floodgate 仓库 -->
         <repository>
             <id>opencollab-snapshot</id>
@@ -41,17 +36,10 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21-R0.1-SNAPSHOT</version>
+            <version>1.21.0-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <!-- AuthMe -->
-        <dependency>
-            <groupId>fr.xephi</groupId>
-            <artifactId>authme</artifactId>
-            <version>5.6.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- Floodgate -->
+        <!-- Floodgate API (可选) -->
         <dependency>
             <groupId>org.geysermc.floodgate</groupId>
             <artifactId>api</artifactId>

@@ -5,6 +5,7 @@ import cn.ningmo.authmeform.utils.MessageUtils;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Method;
+import java.util.UUID;
 
 public class BedrockFormGUI {
     
@@ -68,24 +69,64 @@ public class BedrockFormGUI {
     }
     
     private static Object createLoginForm() throws Exception {
-        // 这里应该使用Floodgate的FormAPI创建登录表单
-        // 由于反射较为复杂，以下代码只是一个简化的示例
+        // 使用反射调用FormBuilder的方法创建表单
+        Class<?> builderClass = Class.forName("org.geysermc.cumulus.SimpleForm$Builder");
+        Object builder = builderClass.getMethod("builder").invoke(null);
         
-        // 实际项目中应该查看Floodgate FormAPI的文档
-        return null;
+        // 设置标题
+        builderClass.getMethod("title", String.class).invoke(builder, 
+                MessageUtils.colorize(AuthMeForm.getInstance().getConfigManager().getMessage("login_title")));
+        
+        // 设置内容
+        builderClass.getMethod("content", String.class).invoke(builder, 
+                MessageUtils.colorize(AuthMeForm.getInstance().getConfigManager().getMessage("login_prompt")));
+        
+        // 添加输入框
+        builderClass.getMethod("inputField", String.class, String.class).invoke(builder, 
+                MessageUtils.colorize("&a输入密码"), "");
+        
+        // 添加提交按钮
+        builderClass.getMethod("button", String.class).invoke(builder, "登录");
+        
+        // 构建表单
+        return builderClass.getMethod("build").invoke(builder);
     }
     
     private static Object createRegisterForm() throws Exception {
-        // 这里应该使用Floodgate的FormAPI创建注册表单
-        // 由于反射较为复杂，以下代码只是一个简化的示例
+        // 使用反射调用FormBuilder的方法创建表单
+        Class<?> builderClass = Class.forName("org.geysermc.cumulus.SimpleForm$Builder");
+        Object builder = builderClass.getMethod("builder").invoke(null);
         
-        // 实际项目中应该查看Floodgate FormAPI的文档
-        return null;
+        // 设置标题
+        builderClass.getMethod("title", String.class).invoke(builder, 
+                MessageUtils.colorize(AuthMeForm.getInstance().getConfigManager().getMessage("register_title")));
+        
+        // 设置内容
+        builderClass.getMethod("content", String.class).invoke(builder, 
+                MessageUtils.colorize(AuthMeForm.getInstance().getConfigManager().getMessage("register_prompt")));
+        
+        // 添加输入框
+        builderClass.getMethod("inputField", String.class, String.class).invoke(builder, 
+                MessageUtils.colorize("&a输入密码"), "");
+        
+        // 添加提交按钮
+        builderClass.getMethod("button", String.class).invoke(builder, "注册");
+        
+        // 构建表单
+        return builderClass.getMethod("build").invoke(builder);
     }
     
     private static void sendForm(Player player, Object form) throws Exception {
-        // 发送表单给玩家
-        // 这里应该使用Floodgate API将表单发送给玩家
-        // 实际项目中需要根据Floodgate API文档实现
+        // 获取FloodgateApi实例
+        Class<?> floodgateApiClass = Class.forName("org.geysermc.floodgate.api.FloodgateApi");
+        Object floodgateApi = floodgateApiClass.getMethod("getInstance").invoke(null);
+        
+        // 获取FloodgatePlayer
+        UUID playerUuid = player.getUniqueId();
+        Object floodgatePlayer = floodgateApiClass.getMethod("getPlayer", UUID.class).invoke(floodgateApi, playerUuid);
+        
+        // 发送表单
+        Class<?> floodgatePlayerClass = Class.forName("org.geysermc.floodgate.api.player.FloodgatePlayer");
+        floodgatePlayerClass.getMethod("sendForm", form.getClass()).invoke(floodgatePlayer, form);
     }
 } 
