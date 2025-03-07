@@ -82,23 +82,25 @@ public class AnvilGUI {
             // 用户关闭了登录窗口，发送退出消息
             MessageUtils.sendMessage(player, "login_cancelled");
             
-            // 延迟重新打开登录菜单
+            // 延迟重新打开登录菜单，使用随机延迟避免与其他插件冲突
+            int delay = 10 + (int)(Math.random() * 10); // 0.5-1秒的随机延迟
             Bukkit.getScheduler().runTaskLater(AuthMeForm.getInstance(), () -> {
                 if (player.isOnline() && !AuthMeForm.getInstance().getAuthMeApi().isAuthenticated(player)) {
                     openLoginGUI(player);
                 }
-            }, 20L);
+            }, delay);
         } else if (playersInRegister.containsKey(playerUUID)) {
             playersInRegister.remove(playerUUID);
             // 用户关闭了注册窗口，发送退出消息
             MessageUtils.sendMessage(player, "register_cancelled");
             
-            // 延迟重新打开注册菜单
+            // 延迟重新打开注册菜单，使用随机延迟
+            int delay = 10 + (int)(Math.random() * 10);
             Bukkit.getScheduler().runTaskLater(AuthMeForm.getInstance(), () -> {
                 if (player.isOnline() && !AuthMeForm.getInstance().getAuthMeApi().isRegistered(player.getName())) {
                     openRegisterGUI(player);
                 }
-            }, 20L);
+            }, delay);
         }
     }
     

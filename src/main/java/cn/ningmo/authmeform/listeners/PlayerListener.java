@@ -5,6 +5,7 @@ import cn.ningmo.authmeform.gui.AnvilGUI;
 import cn.ningmo.authmeform.gui.BedrockFormGUI;
 import cn.ningmo.authmeform.utils.MessageUtils;
 import fr.xephi.authme.api.v3.AuthMeApi;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -76,46 +77,59 @@ public class PlayerListener implements Listener {
     private void handleJavaPlayer(Player player, boolean isRegistered) {
         // 检查Java版自动登录
         if (plugin.getConfigManager().isJavaAutoLoginEnabled() && isRegistered) {
-            // 实际项目中需要一个更安全的自动登录机制
-            // 这里只是简单示例
             MessageUtils.sendMessage(player, "auto_login");
             return;
         }
         
         // 检查是否启用了铁砧菜单
         if (plugin.getConfigManager().isJavaAnvilEnabled()) {
-            if (isRegistered) {
-                // 打开登录菜单
-                AnvilGUI.openLoginGUI(player);
-            } else {
-                // 打开注册菜单
-                AnvilGUI.openRegisterGUI(player);
-            }
+            // 延迟打开菜单，确保玩家已完全加载
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (player.isOnline() && !authMeApi.isAuthenticated(player)) {
+                    if (isRegistered) {
+                        // 打开登录菜单
+                        AnvilGUI.openLoginGUI(player);
+                    } else {
+                        // 打开注册菜单
+                        AnvilGUI.openRegisterGUI(player);
+                    }
+                }
+            }, 20L); // 1秒延迟
         }
     }
     
     private void handleBedrockPlayer(Player player, boolean isRegistered) {
         // 检查是否启用了基岩版自动登录/注册
         if (isRegistered && plugin.getConfigManager().isBedrockAutoLoginEnabled()) {
-            // 基岩版自动登录
             MessageUtils.sendMessage(player, "auto_login");
             return;
         } else if (!isRegistered && plugin.getConfigManager().isBedrockAutoRegisterEnabled()) {
-            // 基岩版自动注册
-            // 注意：这里应该实现更安全的自动注册方式，例如生成随机密码并通过消息发送给玩家
             MessageUtils.sendMessage(player, "auto_register");
             return;
         }
         
         // 检查是否启用了基岩版表单
         if (plugin.getConfigManager().isBedrockFormEnabled()) {
-            if (isRegistered) {
-                // 打开登录表单
-                BedrockFormGUI.openLoginForm(player);
-            } else {
-                // 打开注册表单
-                BedrockFormGUI.openRegisterForm(player);
-            }
+            // 延迟并尝试多次发送表单
+            new BukkitRunnable() {
+                int attempts = 0;
+                @Override
+                public void run() {
+                    if (!player.isOnline() || authMeApi.isAuthenticated(player) || attempts >= 3) {
+                        this.cancel();
+                        return;
+                    }
+                    
+                    attempts++;
+                    if (isRegistered) {
+                        // 打开登录表单
+                        BedrockFormGUI.openLoginForm(player);
+                    } else {
+                        // 打开注册表单
+                        BedrockFormGUI.openRegisterForm(player);
+                    }
+                }
+            }.runTaskTimer(plugin, 20L, 60L); // 延迟1秒开始，每3秒尝试一次，最多3次
         }
     }
     
