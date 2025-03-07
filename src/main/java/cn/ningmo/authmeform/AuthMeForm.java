@@ -7,6 +7,7 @@ import cn.ningmo.authmeform.config.ConfigManager;
 import cn.ningmo.authmeform.data.UserManager;
 import cn.ningmo.authmeform.listeners.*;
 import cn.ningmo.authmeform.session.SessionManager;
+import cn.ningmo.authmeform.session.Session;
 import cn.ningmo.authmeform.security.LoginAttemptManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

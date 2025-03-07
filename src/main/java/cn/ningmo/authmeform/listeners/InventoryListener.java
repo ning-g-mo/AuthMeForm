@@ -2,6 +2,7 @@ package cn.ningmo.authmeform.listeners;
 
 import cn.ningmo.authmeform.AuthMeForm;
 import cn.ningmo.authmeform.gui.AnvilGUI;
+import cn.ningmo.authmeform.utils.MessageUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -44,14 +45,14 @@ public class InventoryListener implements Listener {
             event.setCancelled(true);
             
             // 延迟一tick关闭物品栏
-            Bukkit.getScheduler().runTask(plugin, () -> {
+            Bukkit.getScheduler().runTask(plugin, (Runnable)() -> {
                 player.closeInventory();
             });
             
             // 再延迟一点踢出玩家，给他们时间看提示消息
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if (player.isOnline()) {
-                    player.kickPlayer(MessageUtils.colorize("&6您已选择退出游戏"));
+                    player.kickPlayer("§6您已选择退出游戏");
                 }
             }, 10L);
             
@@ -71,7 +72,7 @@ public class InventoryListener implements Listener {
             event.setCancelled(true);
             
             // 关闭玩家的物品栏
-            Bukkit.getScheduler().runTask(plugin, player::closeInventory);
+            Bukkit.getScheduler().runTask(plugin, (Runnable)() -> player.closeInventory());
             
             // 获取输出的文本
             String outputText = "";
