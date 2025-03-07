@@ -65,10 +65,18 @@ public class InteractionListener implements Listener {
     }
     
     private void handlePlayerInteraction(Player player) {
+        // 检查玩家是否刚刚登录（使用元数据）
+        if (player.hasMetadata("authmeform_just_logged_in")) {
+            plugin.debug("玩家 " + player.getName() + " 刚刚登录，忽略交互检查");
+            return;
+        }
+
         // 检查玩家是否已登录
-        if (plugin.getSessionManager().isAuthenticated(player)) {
+        if (plugin.getSessionManager().isAuthenticated(player.getUniqueId())) {
             // 清除可能存在的冷却记录，确保登录状态下没有冷却记录
             lastMenuShownTime.remove(player.getUniqueId());
+            // 记录日志帮助调试
+            plugin.debug("玩家 " + player.getName() + " 已经登录，不需要显示登录菜单");
             return;
         }
         

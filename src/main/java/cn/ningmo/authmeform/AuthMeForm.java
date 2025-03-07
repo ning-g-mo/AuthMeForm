@@ -9,8 +9,11 @@ import cn.ningmo.authmeform.listeners.*;
 import cn.ningmo.authmeform.session.SessionManager;
 import cn.ningmo.authmeform.security.LoginAttemptManager;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.UUID;
 
 public class AuthMeForm extends JavaPlugin {
     
@@ -115,5 +118,29 @@ public class AuthMeForm extends JavaPlugin {
     
     public LoginAttemptManager getLoginAttemptManager() {
         return loginAttemptManager;
+    }
+    
+    /**
+     * 记录调试日志
+     */
+    public void debug(String message) {
+        if (configManager.getConfig().getBoolean("debug_mode", false)) {
+            getLogger().info("[DEBUG] " + message);
+        }
+    }
+
+    /**
+     * 强制刷新玩家的会话状态
+     */
+    public void refreshSession(Player player) {
+        UUID uuid = player.getUniqueId();
+        if (sessionManager.isAuthenticated(uuid)) {
+            // 更新会话活动时间
+            Session session = sessionManager.getSession(uuid);
+            if (session != null) {
+                session.updateActivity();
+                debug("已刷新玩家 " + player.getName() + " 的会话活动时间");
+            }
+        }
     }
 } 

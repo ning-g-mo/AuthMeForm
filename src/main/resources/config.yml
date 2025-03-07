@@ -12,6 +12,7 @@ bedrock_auto_register: false   # 是否为基岩版启用自动注册
 
 # 会话设置
 session_timeout: 1800000       # 会话超时时间（毫秒），默认30分钟
+debug_mode: false            # 是否启用调试模式，会输出更多日志信息
 
 # 消息设置
 messages:

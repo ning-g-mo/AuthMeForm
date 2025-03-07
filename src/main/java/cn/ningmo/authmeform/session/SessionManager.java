@@ -1,7 +1,9 @@
 package cn.ningmo.authmeform.session;
 
 import cn.ningmo.authmeform.AuthMeForm;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,14 +21,33 @@ public class SessionManager {
     }
     
     public boolean isAuthenticated(UUID uuid) {
+        plugin.debug("检查玩家认证状态: " + uuid);
+        
+        // 优先检查会话，避免缓存问题
+        Session session = sessions.get(uuid);
+        if (session != null && session.isValid()) {
+            plugin.debug("玩家有有效会话，认为已登录: " + uuid);
+            // 确保缓存与实际状态一致
+            if (!Boolean.TRUE.equals(authStatusCache.get(uuid))) {
+                plugin.debug("更新缓存状态为已认证: " + uuid);
+                authStatusCache.put(uuid, true);
+            }
+            return true;
+        }
+        
         // 首先检查缓存
         Boolean status = authStatusCache.get(uuid);
         if (status != null) {
+            // 如果缓存显示已认证，但会话不存在或无效，修正缓存
+            if (status && (session == null || !session.isValid())) {
+                authStatusCache.put(uuid, false);
+                return false;
+            }
             return status;
         }
         
         // 缓存未命中，检查会话
-        Session session = sessions.get(uuid);
+        session = sessions.get(uuid);
         boolean authenticated = session != null && session.isValid();
         
         // 缓存结果
@@ -52,6 +73,20 @@ public class SessionManager {
         // 记录会话创建日志
         plugin.getLogger().info("为玩家 " + player.getName() + " 创建新会话，有效期: " + 
             (plugin.getConfigManager().getSessionTimeout() / 60000) + " 分钟");
+        
+        // 确保玩家能够移动并交互 - 清除所有可能的限制
+        player.setWalkSpeed(0.2f); // 恢复正常行走速度
+        player.setFlySpeed(0.1f);  // 恢复正常飞行速度
+        
+        // 设置一个临时属性，帮助其他系统识别登录状态变更
+        player.setMetadata("authmeform_just_logged_in", new FixedMetadataValue(plugin, true));
+        
+        // 延迟移除这个标记
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (player.isOnline()) {
+                player.removeMetadata("authmeform_just_logged_in", plugin);
+            }
+        }, 20L); // 1秒后移除
     }
     
     public void destroySession(UUID uuid) {
@@ -78,5 +113,12 @@ public class SessionManager {
         authStatusCache.clear();
         
         lastCleanupTime = now;
+    }
+    
+    /**
+     * 获取玩家会话
+     */
+    public Session getSession(UUID uuid) {
+        return sessions.get(uuid);
     }
 } 
