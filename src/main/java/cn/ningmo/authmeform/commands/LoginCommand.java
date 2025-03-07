@@ -29,13 +29,24 @@ public class LoginCommand implements CommandExecutor {
         }
         
         // 获取聊天登录监听器
+        boolean useAnvil = plugin.getConfigManager().useAnvilLogin();
         
         if (plugin.getUserManager().isRegistered(player.getName())) {
-            // 使用聊天框登录
-            plugin.getChatLoginListener().startChatLogin(player);
+            if (useAnvil) {
+                // 使用铁砧菜单登录
+                cn.ningmo.authmeform.gui.AnvilGUI.openLoginGUI(player);
+            } else {
+                // 使用聊天框登录
+                plugin.getChatLoginListener().startChatLogin(player);
+            }
         } else {
-            // 使用聊天框注册
-            plugin.getChatLoginListener().startChatRegister(player);
+            if (useAnvil) {
+                // 使用铁砧菜单注册
+                cn.ningmo.authmeform.gui.AnvilGUI.openRegisterGUI(player);
+            } else {
+                // 使用聊天框注册
+                plugin.getChatLoginListener().startChatRegister(player);
+            }
         }
         
         return true;

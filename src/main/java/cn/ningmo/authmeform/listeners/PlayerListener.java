@@ -78,16 +78,33 @@ public class PlayerListener implements Listener {
             return;
         }
         
-        // 延迟启动聊天登录
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (player.isOnline() && !plugin.getSessionManager().isAuthenticated(player)) {
+        // 延迟使用铁砧菜单
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!player.isOnline() || plugin.getSessionManager().isAuthenticated(player)) {
+                    return;
+                }
+                
+                // 根据配置决定使用铁砧菜单还是聊天框
+                boolean useAnvil = plugin.getConfigManager().useAnvilLogin();
+                
+                // 打开登录/注册界面
                 if (isRegistered) {
-                    plugin.getChatLoginListener().startChatLogin(player);
+                    if (useAnvil) {
+                        AnvilGUI.openLoginGUI(player);
+                    } else {
+                        plugin.getChatLoginListener().startChatLogin(player);
+                    }
                 } else {
-                    plugin.getChatLoginListener().startChatRegister(player);
+                    if (useAnvil) {
+                        AnvilGUI.openRegisterGUI(player);
+                    } else {
+                        plugin.getChatLoginListener().startChatRegister(player);
+                    }
                 }
             }
-        }, 20L);
+        }.runTaskLater(plugin, 10L); // 0.5秒后执行
     }
     
     private void handleBedrockPlayer(Player player, boolean isRegistered) {

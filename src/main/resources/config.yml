@@ -4,6 +4,7 @@
 # 基本设置
 java_anvil_enabled: true       # 是否为Java版启用铁砧菜单
 java_auto_login: false         # 是否为Java版启用自动登录
+java_login_method: "anvil"    # Java版登录方式，可选值: "anvil"(铁砧菜单) 或 "chat"(聊天框)
 
 bedrock_form_enabled: true     # 是否为基岩版启用表单
 bedrock_auto_login: false      # 是否为基岩版启用自动登录

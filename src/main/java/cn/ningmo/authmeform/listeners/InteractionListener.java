@@ -115,13 +115,25 @@ public class InteractionListener implements Listener {
                 cn.ningmo.authmeform.gui.BedrockFormGUI.openRegisterForm(player);
             }
         } else {
-            // Java版玩家，尝试使用聊天登录
+            // Java版玩家，根据配置决定使用铁砧菜单还是聊天框
+            boolean useAnvil = plugin.getConfigManager().useAnvilLogin();
+            
             if (isRegistered) {
-                plugin.getLogger().info("为Java版玩家 " + player.getName() + " 启动聊天登录");
-                plugin.getChatLoginListener().startChatLogin(player);
+                if (useAnvil) {
+                    plugin.getLogger().info("为Java版玩家 " + player.getName() + " 打开铁砧登录菜单");
+                    cn.ningmo.authmeform.gui.AnvilGUI.openLoginGUI(player);
+                } else {
+                    plugin.getLogger().info("为Java版玩家 " + player.getName() + " 启动聊天登录");
+                    plugin.getChatLoginListener().startChatLogin(player);
+                }
             } else {
-                plugin.getLogger().info("为Java版玩家 " + player.getName() + " 启动聊天注册");
-                plugin.getChatLoginListener().startChatRegister(player);
+                if (useAnvil) {
+                    plugin.getLogger().info("为Java版玩家 " + player.getName() + " 打开铁砧注册菜单");
+                    cn.ningmo.authmeform.gui.AnvilGUI.openRegisterGUI(player);
+                } else {
+                    plugin.getLogger().info("为Java版玩家 " + player.getName() + " 启动聊天注册");
+                    plugin.getChatLoginListener().startChatRegister(player);
+                }
             }
         }
     }

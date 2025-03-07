@@ -45,6 +45,22 @@ public class ConfigManager {
         return config.getBoolean("java_anvil_enabled", true);
     }
     
+    /**
+     * 获取Java版登录方式
+     * @return 登录方式："anvil"表示铁砧菜单，"chat"表示聊天框
+     */
+    public String getJavaLoginMethod() {
+        return config.getString("java_login_method", "anvil");
+    }
+    
+    /**
+     * 检查是否使用铁砧菜单登录
+     * @return 如果使用铁砧菜单则为true，如果使用聊天框则为false
+     */
+    public boolean useAnvilLogin() {
+        return "anvil".equalsIgnoreCase(getJavaLoginMethod());
+    }
+    
     public boolean isJavaAutoLoginEnabled() {
         return config.getBoolean("java_auto_login", false);
     }
