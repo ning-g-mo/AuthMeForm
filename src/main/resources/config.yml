@@ -1,0 +1,30 @@
+# AuthMeForm 配置文件
+# 作者: 柠枺 (ning-g-mo)
+
+# 基本设置
+java_anvil_enabled: true      # 是否为Java版启用铁砧菜单
+java_auto_login: false        # 是否为Java版启用自动登录
+
+bedrock_form_enabled: true    # 是否为基岩版启用表单
+bedrock_auto_login: false     # 是否为基岩版启用自动登录
+bedrock_auto_register: false  # 是否为基岩版启用自动注册
+
+# 消息设置
+messages:
+  # 登录相关
+  login_title: "&6登录"
+  login_prompt: "&e请在此输入您的密码"
+  login_message: "&a请在铁砧中输入您的密码来登录"
+  login_success: "&a登录成功！"
+  login_cancelled: "&c登录操作已取消，请重新尝试"
+  
+  # 注册相关
+  register_title: "&6注册"
+  register_prompt: "&e请在此设置您的密码"
+  register_message: "&a请在铁砧中设置您的密码来注册"
+  register_success: "&a注册成功！"
+  register_cancelled: "&c注册操作已取消，请重新尝试"
+  
+  # 自动登录相关
+  auto_login: "&a您已被自动登录！"
+  auto_register: "&a您已被自动注册！" 

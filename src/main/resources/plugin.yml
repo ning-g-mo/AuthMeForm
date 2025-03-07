@@ -1,0 +1,25 @@
+name: AuthMeForm
+version: 1.0.0
+main: cn.ningmo.authmeform.AuthMeForm
+api-version: 1.21
+authors: [柠枺]
+description: 使用authme API为JAVA版提供铁砧菜单/基岩版提供表单作为登录或注册
+website: https://github.com/ning-g-mo
+
+depend: [AuthMe]
+softdepend: [floodgate]
+
+commands:
+  authmeform:
+    description: AuthMeForm 主命令
+    aliases: [amf]
+    usage: /authmeform
+    permission: authmeform.use
+
+permissions:
+  authmeform.use:
+    description: 允许使用AuthMeForm基本命令
+    default: true
+  authmeform.admin:
+    description: 允许使用AuthMeForm管理命令
+    default: op 
